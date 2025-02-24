@@ -17,6 +17,7 @@ namespace GridForAstar2025
 
         private int current;
         public bool MoveDone = true;
+        public bool readyToMove = true;
         public List<Cell> Path { get; private set; }
 
 
@@ -30,6 +31,7 @@ namespace GridForAstar2025
 
         public void SetPath(List<Cell> path)
         {
+            readyToMove = false;
             if (path is null) return;
             if (path.Count < 1) return;
 
@@ -78,6 +80,8 @@ namespace GridForAstar2025
                     if (pos == new Vector2(Path.Last().Position.X, Path.Last().Position.Y))
                     {
                         GameWorld.start = Path.Last();
+                        readyToMove = true;
+
                     }
                 }
             

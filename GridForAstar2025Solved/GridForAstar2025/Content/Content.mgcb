@@ -61,6 +61,18 @@
 /processorParam:TextureFormat=Color
 /build:GoalBtn.png
 
+#begin IceTower.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:IceTower.png
+
 #begin Mushroom-Attack.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -104,6 +116,18 @@
 /processorParam:TextureFormat=Color
 /build:Pixel.png
 
+#begin Portal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Portal.png
+
 #begin ResetBtn.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -140,7 +164,7 @@
 /processorParam:TextureFormat=Color
 /build:StartBtn.png
 
-#begin Tower 05.png
+#begin StormTower.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -150,19 +174,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Tower 05.png
-
-#begin Tower 06.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Tower 06.png
+/build:StormTower.png
 
 #begin Wall.png
 /importer:TextureImporter

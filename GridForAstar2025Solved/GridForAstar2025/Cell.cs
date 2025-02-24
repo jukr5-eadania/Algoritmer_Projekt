@@ -74,8 +74,8 @@ public class Cell
         spriteBatch.Draw(GameWorld.Instance.sprites["Pixel"], bottomLine, edgeColor);
         spriteBatch.Draw(GameWorld.Instance.sprites["Pixel"], rightLine, edgeColor);
         spriteBatch.Draw(GameWorld.Instance.sprites["Pixel"], leftLine, edgeColor);
-        string cellString = $"{Position.X.ToString()},{Position.Y.ToString()}\n F:{F} \n h:{H}\n g: {G}";
-        spriteBatch.DrawString(GameWorld.Instance.SpriteFont, cellString, new Vector2(topLine.X, topLine.Y), Color.Black);
+        //string cellString = $"{Position.X.ToString()},{Position.Y.ToString()}\n F:{F} \n h:{H}\n g: {G}";
+        //spriteBatch.DrawString(GameWorld.Instance.SpriteFont, cellString, new Vector2(topLine.X, topLine.Y), Color.Black);
 
 
 

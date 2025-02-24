@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GridForAstar2025;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Transactions;
@@ -60,9 +62,11 @@ namespace GridForAstar2025
         Button findPathButton = new Button("FindPathBtn", BUTTONTYPE.FINDPATH);
 
         private Wizard wizard;
-        
+        int goalIndex = 0;
+        bool started = false;
+
         private List<Cell> goals = new List<Cell>();
-        private Cell start, stormTowerKey, iceTowerKey, stormTower, iceTower, Portal;
+        static public Cell start, stormTowerKey, iceTowerKey, stormTower, iceTower, Portal;
         HashSet<Point> usedCells = new HashSet<Point>();
 
         private Random rnd = new Random();
@@ -170,39 +174,39 @@ namespace GridForAstar2025
             if (Cells.TryGetValue(new Point(1, 8), out Cell startCell))
             {
                 start = startCell;
-                start.Sprite = sprites["Mario"];
+                wizard = new(startCell, sprites["BunnyIdleF"]);
                 usedCells.Add(start.Position);
             }
             if (Cells.TryGetValue(GetRandomUnusedCell(), out Cell goalCell1))
             {
                 stormTowerKey = goalCell1;
-                stormTowerKey.Sprite = sprites["Peach"];
+                stormTowerKey.Sprite = sprites["SilverKey"];
                 goals.Add(stormTowerKey);
             }
-            if (Cells.TryGetValue(GetRandomUnusedCell(), out Cell goalCell2))
+            if (Cells.TryGetValue(new Point(2, 4), out Cell goalCell2))
             {
-                iceTowerKey = goalCell2;
-                iceTowerKey.Sprite = sprites["Peach"];
-                goals.Add(iceTowerKey);
-            }
-            if (Cells.TryGetValue(new Point(2, 4), out Cell goalCell3))
-            {
-                stormTower = goalCell3;
-                stormTower.Sprite = sprites["Peach"];
+                stormTower = goalCell2;
+                stormTower.Sprite = sprites["StormTower"];
                 goals.Add(stormTower);
                 usedCells.Add(stormTower.Position);
+            }
+            if (Cells.TryGetValue(GetRandomUnusedCell(), out Cell goalCell3))
+            {
+                iceTowerKey = goalCell3;
+                iceTowerKey.Sprite = sprites["BlueKey"];
+                goals.Add(iceTowerKey);
             }
             if (Cells.TryGetValue(new Point(8, 7), out Cell goalCell4))
             {
                 iceTower = goalCell4;
-                iceTower.Sprite = sprites["Peach"];
+                iceTower.Sprite = sprites["IceTower"];
                 goals.Add(iceTower);
                 usedCells.Add(iceTower.Position);
             }
             if (Cells.TryGetValue(new Point(0, 8), out Cell goalCell5))
             {
                 Portal = goalCell5;
-                Portal.Sprite = sprites["Peach"];
+                Portal.Sprite = sprites["Portal"];
                 goals.Add(Portal);
                 usedCells.Add(Portal.Position);
             }
@@ -235,10 +239,21 @@ namespace GridForAstar2025
             {
                 btn.Update();
             }
-            
+
             if (!(wizard == null))
             {
                 wizard.Update(gameTime);
+            }
+
+            if (started && wizard.readyToMove)
+            {
+                if (goalIndex == 5)
+                {
+                    goalIndex = 0;
+                }
+                    Astar(goals[goalIndex]);
+                    goalIndex++;
+
             }
 
             base.Update(gameTime);
@@ -262,7 +277,7 @@ namespace GridForAstar2025
             }
             if (!(wizard == null))
             {
-            wizard.Draw(_spriteBatch);
+                wizard.Draw(_spriteBatch);
             }
             _spriteBatch.End();
 
@@ -274,16 +289,8 @@ namespace GridForAstar2025
         {
             if (clicked == BUTTONTYPE.FINDPATH)
             {
-                Astar astar = new Astar(Cells);
-                foreach (var goal in goals)
-                {
-                    var path = astar.FindPath(start.Position, goal.Position);
-                    foreach (var VARIABLE in path)
-                    {
-                        VARIABLE.spriteColor = Color.Aqua;
-                    }
-                    start = goal;
-                }
+                started = true;
+               
             }
             else
             {
@@ -302,35 +309,25 @@ namespace GridForAstar2025
 
                 }
                 start = clicked;
-                wizard = new(clicked, sprites["BunnyIdleF"]);
+               
             }
-            //else if (CurrentButton == BUTTONTYPE.GOAL)
-            //{
-            //    if (goal != null)
-            //    {
-            //        goal.Reset();
-
-            //    }
-
-            //    goal = clicked;
-
-
-                foreach (var item in Cells)
-                {
-                    item.Value.spriteColor = Color.White;
-                }
-                Astar();
-
-            }
+            
             else if (CurrentButton == BUTTONTYPE.WALL)
             {
                 clicked.Sprite = sprites["Wall"];
             }
 
 
+            foreach (var item in Cells)
+            {
+                item.Value.spriteColor = Color.White;
+            }
+            
+
         }
 
-        public void Astar()
+
+        public void Astar(Cell goal)
         {
             Astar astar = new Astar(Cells);
             var path = astar.FindPath(start.Position, goal.Position);
@@ -339,6 +336,7 @@ namespace GridForAstar2025
                 VARIABLE.spriteColor = Color.Aqua;
             }
             wizard.SetPath(path);
+        }
 
 
         public Point GetRandomUnusedCell()
@@ -353,4 +351,6 @@ namespace GridForAstar2025
             return point;
         }
     }
+
 }
+
