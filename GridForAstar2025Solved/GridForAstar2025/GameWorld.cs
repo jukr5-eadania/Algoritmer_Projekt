@@ -57,7 +57,7 @@ namespace GridForAstar2025
         Button wallbutton = new Button("WallBtn", BUTTONTYPE.WALL);
         Button findPathButton = new Button("FindPathBtn", BUTTONTYPE.FINDPATH);
         private List<Cell> goals = new List<Cell>();
-        private Cell start, goal1, goal2, goal3, goal4, goal5;
+        private Cell start, stormTowerKey, iceTowerKey, stormTower, iceTower, Portal;
 
         public GameWorld()
         {
@@ -115,6 +115,47 @@ namespace GridForAstar2025
                 cell.Value.LoadContent();
             }
 
+            int[,] wallPattern = new int[,]
+            {
+                {1, 1, 1},
+                {1, 1, 1},
+                {1, 1, 1},
+                {1, 1, 1},
+                {1, 1, 1},
+                {1, 1, 1}
+            };
+
+            int wOffsetX = 4, wOffsetY = 1;
+            for (int y = 0; y < wallPattern.GetLength(0); y++)
+            {
+                for (int x = 0; x < wallPattern.GetLength(1); x++)
+                {
+                    if (wallPattern[y, x] == 1 && Cells.TryGetValue(new Point(x + wOffsetX, y + wOffsetY), out Cell wallCell))
+                    {
+                        wallCell.Sprite = sprites["Wall"];
+                    }
+                }
+            }
+
+            int[,] forestPattern = new int[,]
+            {
+                {1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 0},
+                {1, 1, 1, 1, 1},
+            };
+
+            int fOffsetX = 2, fOffsetY = 7;
+            for (int y = 0; y < forestPattern.GetLength(0); y++)
+            {
+                for (int x = 0; x < forestPattern.GetLength(1); x++)
+                {
+                    if (forestPattern[y, x] == 1 && Cells.TryGetValue(new Point(x + fOffsetX, y + fOffsetY), out Cell wallCell))
+                    {
+                        wallCell.Sprite = sprites["Wall"];
+                    }
+                }
+            }
+
             if (Cells.TryGetValue(new Point(1, 8), out Cell startCell))
             {
                 start = startCell;
@@ -122,33 +163,33 @@ namespace GridForAstar2025
             }
             if (Cells.TryGetValue(new Point(0, 0), out Cell goalCell1))
             {
-                goal1 = goalCell1;
-                goal1.Sprite = sprites["Peach"];
-                goals.Add(goal1);
+                stormTowerKey = goalCell1;
+                stormTowerKey.Sprite = sprites["Peach"];
+                goals.Add(stormTowerKey);
             }
             if (Cells.TryGetValue(new Point(2, 4), out Cell goalCell2))
             {
-                goal2 = goalCell2;
-                goal2.Sprite = sprites["Peach"];
-                goals.Add(goal2);
+                iceTowerKey = goalCell2;
+                iceTowerKey.Sprite = sprites["Peach"];
+                goals.Add(iceTowerKey);
             }
             if (Cells.TryGetValue(new Point(9, 9), out Cell goalCell3))
             {
-                goal3 = goalCell3;
-                goal3.Sprite = sprites["Peach"];
-                goals.Add(goal3);
+                stormTower = goalCell3;
+                stormTower.Sprite = sprites["Peach"];
+                goals.Add(stormTower);
             }
             if (Cells.TryGetValue(new Point(8, 7), out Cell goalCell4))
             {
-                goal4 = goalCell4;
-                goal4.Sprite = sprites["Peach"];
-                goals.Add(goal4);
+                iceTower = goalCell4;
+                iceTower.Sprite = sprites["Peach"];
+                goals.Add(iceTower);
             }
             if (Cells.TryGetValue(new Point(0, 8), out Cell goalCell5))
             {
-                goal5 = goalCell5;
-                goal5.Sprite = sprites["Peach"];
-                goals.Add(goal5);
+                Portal = goalCell5;
+                Portal.Sprite = sprites["Peach"];
+                goals.Add(Portal);
             }
 
             PlaceButtons();
