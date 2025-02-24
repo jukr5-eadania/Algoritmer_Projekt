@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.IO;
+using System.Transactions;
 
 namespace GridForAstar2025
 {
@@ -57,7 +58,8 @@ namespace GridForAstar2025
         Button goalButton = new Button("GoalBtn", BUTTONTYPE.GOAL);
         Button wallbutton = new Button("WallBtn", BUTTONTYPE.WALL);
         Button findPathButton = new Button("FindPathBtn", BUTTONTYPE.FINDPATH);
-        private Cell start, goal;
+        static public Cell start, goal;
+        private Wizard wizard;
 
         public GameWorld()
         {
@@ -146,6 +148,12 @@ namespace GridForAstar2025
             {
                 btn.Update();
             }
+            
+            if (!(wizard == null))
+            {
+                wizard.Update(gameTime);
+            }
+
             base.Update(gameTime);
         }
 
@@ -154,7 +162,7 @@ namespace GridForAstar2025
             GraphicsDevice.Clear(Color.White);
 
             // TODO: Add your drawing code here
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null);
 
             foreach (KeyValuePair<Point, Cell> cell in Cells)
             {
@@ -165,7 +173,10 @@ namespace GridForAstar2025
             {
                 button.Draw(_spriteBatch);
             }
-
+            if (!(wizard == null))
+            {
+            wizard.Draw(_spriteBatch);
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -208,7 +219,7 @@ namespace GridForAstar2025
 
                 }
                 start = clicked;
-                clicked.Sprite = sprites["Mario"];
+                wizard = new(clicked, sprites["BunnyIdleF"]);
             }
             else if (CurrentButton == BUTTONTYPE.GOAL)
             {
@@ -220,7 +231,13 @@ namespace GridForAstar2025
 
                 goal = clicked;
 
-                clicked.Sprite = sprites["Peach"];
+                foreach (var item in Cells)
+                {
+                    item.Value.spriteColor = Color.White;
+                }
+                Astar();
+
+                
             }
             else if (CurrentButton == BUTTONTYPE.WALL)
             {
@@ -228,6 +245,16 @@ namespace GridForAstar2025
             }
 
 
+        }
+        public void Astar()
+        {
+            Astar astar = new Astar(Cells);
+            var path = astar.FindPath(start.Position, goal.Position);
+            foreach (var VARIABLE in path)
+            {
+                VARIABLE.spriteColor = Color.Aqua;
+            }
+            wizard.SetPath(path);
         }
     }
 }
