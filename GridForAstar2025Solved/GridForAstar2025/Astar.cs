@@ -20,6 +20,17 @@ class Astar
 
     public List<Cell> FindPath(Point startPoint, Point endPoint)
     {
+        openList.Clear();
+        closedList.Clear();
+
+        foreach (var cell in cells.Values)
+        {
+            cell.G = 0;
+            cell.H = 0;
+            cell.Parent = null;
+            cell.spriteColor = Color.White;
+        }
+
         openList.Add(cells[startPoint]);
         while (openList.Count > 0)
         {
