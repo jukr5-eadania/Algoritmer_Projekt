@@ -6,7 +6,7 @@ using System.IO;
 
 namespace GridForAstar2025
 {
-    public enum BUTTONTYPE { START, GOAL, WALL, RESET, FINDPATH }
+    public enum BUTTONTYPE { START, GOAL, WALL, FINDPATH }
 
 
     public class GameWorld : Game
@@ -52,11 +52,11 @@ namespace GridForAstar2025
         private List<Button> buttons = new List<Button>();
         public BUTTONTYPE CurrentButton { get; set; }
 
-        Button resetButton = new Button("ResetBtn", BUTTONTYPE.RESET);
         Button startButton = new Button("StartBtn", BUTTONTYPE.START);
         Button goalButton = new Button("GoalBtn", BUTTONTYPE.GOAL);
         Button wallbutton = new Button("WallBtn", BUTTONTYPE.WALL);
         Button findPathButton = new Button("FindPathBtn", BUTTONTYPE.FINDPATH);
+        private List<Cell> goals = new List<Cell>();
         private Cell start, goal;
 
         public GameWorld()
@@ -69,8 +69,6 @@ namespace GridForAstar2025
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             for (int y = 0; y < cellCount; y++)
             {
                 for (int x = 0; x < cellCount; x++)
@@ -79,7 +77,6 @@ namespace GridForAstar2025
                 }
             }
 
-            buttons.Add(resetButton);
             buttons.Add(startButton);
             buttons.Add(goalButton);
             buttons.Add(wallbutton);
@@ -116,6 +113,17 @@ namespace GridForAstar2025
             foreach (KeyValuePair<Point, Cell> cell in Cells)
             {
                 cell.Value.LoadContent();
+            }
+
+            if (Cells.TryGetValue(new Point(1, 8), out Cell startCell))
+            {
+                start = startCell;
+                start.Sprite = sprites["Mario"];
+            }
+            if (Cells.TryGetValue(new Point(8, 1), out Cell goalCell))
+            {
+                goal = goalCell;
+                goal.Sprite = sprites["Peach"];
             }
 
             PlaceButtons();
@@ -174,21 +182,16 @@ namespace GridForAstar2025
 
         public void OnButtonClick(BUTTONTYPE clicked)
         {
-
-            if (clicked == BUTTONTYPE.RESET)
-            {
-                foreach (KeyValuePair<Point, Cell> cell in Cells)
-                {
-                    cell.Value.Reset();
-                }
-            }
-            else if (clicked == BUTTONTYPE.FINDPATH)
+            if (clicked == BUTTONTYPE.FINDPATH)
             {
                 Astar astar = new Astar(Cells);
-                var path = astar.FindPath(start.Position, goal.Position);
-                foreach (var VARIABLE in path)
+                foreach (var item in goals)
                 {
-                    VARIABLE.spriteColor = Color.Aqua;
+                    var path = astar.FindPath(start.Position, goal.Position);
+                    foreach (var VARIABLE in path)
+                    {
+                        VARIABLE.spriteColor = Color.Aqua;
+                    }
                 }
             }
             else
