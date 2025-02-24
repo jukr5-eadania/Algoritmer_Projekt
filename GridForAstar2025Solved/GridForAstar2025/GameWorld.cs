@@ -57,7 +57,7 @@ namespace GridForAstar2025
         Button wallbutton = new Button("WallBtn", BUTTONTYPE.WALL);
         Button findPathButton = new Button("FindPathBtn", BUTTONTYPE.FINDPATH);
         private List<Cell> goals = new List<Cell>();
-        private Cell start, goal;
+        private Cell start, goal1, goal2, goal3, goal4, goal5;
 
         public GameWorld()
         {
@@ -120,10 +120,35 @@ namespace GridForAstar2025
                 start = startCell;
                 start.Sprite = sprites["Mario"];
             }
-            if (Cells.TryGetValue(new Point(8, 1), out Cell goalCell))
+            if (Cells.TryGetValue(new Point(0, 0), out Cell goalCell1))
             {
-                goal = goalCell;
-                goal.Sprite = sprites["Peach"];
+                goal1 = goalCell1;
+                goal1.Sprite = sprites["Peach"];
+                goals.Add(goal1);
+            }
+            if (Cells.TryGetValue(new Point(2, 4), out Cell goalCell2))
+            {
+                goal2 = goalCell2;
+                goal2.Sprite = sprites["Peach"];
+                goals.Add(goal2);
+            }
+            if (Cells.TryGetValue(new Point(9, 9), out Cell goalCell3))
+            {
+                goal3 = goalCell3;
+                goal3.Sprite = sprites["Peach"];
+                goals.Add(goal3);
+            }
+            if (Cells.TryGetValue(new Point(8, 7), out Cell goalCell4))
+            {
+                goal4 = goalCell4;
+                goal4.Sprite = sprites["Peach"];
+                goals.Add(goal4);
+            }
+            if (Cells.TryGetValue(new Point(0, 8), out Cell goalCell5))
+            {
+                goal5 = goalCell5;
+                goal5.Sprite = sprites["Peach"];
+                goals.Add(goal5);
             }
 
             PlaceButtons();
@@ -185,13 +210,14 @@ namespace GridForAstar2025
             if (clicked == BUTTONTYPE.FINDPATH)
             {
                 Astar astar = new Astar(Cells);
-                foreach (var item in goals)
+                foreach (var goal in goals)
                 {
                     var path = astar.FindPath(start.Position, goal.Position);
                     foreach (var VARIABLE in path)
                     {
                         VARIABLE.spriteColor = Color.Aqua;
                     }
+                    start = goal;
                 }
             }
             else
@@ -213,18 +239,18 @@ namespace GridForAstar2025
                 start = clicked;
                 clicked.Sprite = sprites["Mario"];
             }
-            else if (CurrentButton == BUTTONTYPE.GOAL)
-            {
-                if (goal != null)
-                {
-                    goal.Reset();
+            //else if (CurrentButton == BUTTONTYPE.GOAL)
+            //{
+            //    if (goal != null)
+            //    {
+            //        goal.Reset();
 
-                }
+            //    }
 
-                goal = clicked;
+            //    goal = clicked;
 
-                clicked.Sprite = sprites["Peach"];
-            }
+            //    clicked.Sprite = sprites["Peach"];
+            //}
             else if (CurrentButton == BUTTONTYPE.WALL)
             {
                 clicked.Sprite = sprites["Wall"];
