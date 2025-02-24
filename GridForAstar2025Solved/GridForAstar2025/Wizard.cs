@@ -13,7 +13,7 @@ namespace GridForAstar2025
         public Vector2 dest;
 
         private Texture2D sprite;
-        private float speed = 1;
+        private float speed = 5;
 
         private int current;
         public bool MoveDone = true;
@@ -42,12 +42,13 @@ namespace GridForAstar2025
         
         private bool AtDestination()
         {
-            if ((dest - pos).Length() < 5)
+            if ((dest - pos).Length() < 0.1f)
             {
                 pos = dest;
 
                 if (current < Path.Count - 1)
                 {
+                    GameWorld.start = Path[current];
                     current++;
                     dest = new Vector2(Path[current].Position.X, Path[current].Position.Y);
                 }
@@ -70,37 +71,18 @@ namespace GridForAstar2025
                 direction.Normalize();
             }
 
-            
-                pos += (direction) * gameTime.ElapsedGameTime.Seconds;
+
+            pos += (direction * speed) * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (AtDestination())
                 {
                     if (pos == new Vector2(Path.Last().Position.X, Path.Last().Position.Y))
                     {
-                        GameWorld.start.Reset();
                         GameWorld.start = Path.Last();
                     }
                 }
             
             
         }
-
-        //public void Update(GameTime gameTime)
-        //{
-        //    if (MoveDone) return;
-
-        //    var direction = dest - pos;
-        //    if (direction != Vector2.Zero) direction.Normalize();
-
-        //    var distance = gameTime.ElapsedGameTime.Microseconds * speed;
-        //    int iterations = (int)Math.Ceiling(distance / 5);
-        //    distance /= iterations;
-
-        //    for (int i = 0; i < iterations; i++)
-        //    {
-        //        pos = direction * distance;
-        //        if (AtDestination()) return;
-        //    }
-        //}
 
         public void Draw(SpriteBatch spriteBatch)
         {
