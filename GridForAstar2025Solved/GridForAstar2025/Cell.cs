@@ -57,14 +57,7 @@ public class Cell
         background = new Rectangle(Position.X * Width, Position.Y * Height, Width, Height);
     }
 
-    public void Update()
-    {
-        if (background.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed)
-        {
-            OnClick();
-        }
-
-    }
+    
 
     public void Draw(SpriteBatch spriteBatch)
     {
@@ -89,11 +82,6 @@ public class Cell
         H = 0;
     }
 
-    private void OnClick()
-    {
-        GameWorld.Instance.OnCellClick(this);
-
-    }
 
 }
 

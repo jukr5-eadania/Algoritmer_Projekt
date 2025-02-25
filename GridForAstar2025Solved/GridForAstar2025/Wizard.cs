@@ -41,7 +41,7 @@ namespace GridForAstar2025
             MoveDone = false;
         }
 
-        
+
         private bool AtDestination()
         {
             if ((dest - pos).Length() < 0.1f)
@@ -75,17 +75,23 @@ namespace GridForAstar2025
 
 
             pos += (direction * speed) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (AtDestination())
+            if (AtDestination())
+            {
+                if (pos == new Vector2(Path.Last().Position.X, Path.Last().Position.Y))
                 {
-                    if (pos == new Vector2(Path.Last().Position.X, Path.Last().Position.Y))
+                    GameWorld.start = Path.Last();
+                    readyToMove = true;
+                    foreach (Cell item in Path)
                     {
-                        GameWorld.start = Path.Last();
-                        readyToMove = true;
-
+                        if (item.Sprite == GameWorld.Instance.sprites["FakeMushroom"])
+                        {
+                            GameWorld.fakeMushroom.Sprite = GameWorld.Instance.sprites["Mushroom"];
+                        }
                     }
                 }
-            
-            
+            }
+
+
         }
 
         public void Draw(SpriteBatch spriteBatch)

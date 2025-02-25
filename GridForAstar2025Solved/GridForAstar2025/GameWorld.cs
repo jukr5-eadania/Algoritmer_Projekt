@@ -62,11 +62,12 @@ namespace GridForAstar2025
         Button findPathButton = new Button("FindPathBtn", BUTTONTYPE.FINDPATH);
 
         private Wizard wizard;
-        int goalIndex = 0;
+        int goalIndex = -1;
         bool started = false;
+        int chosenAlgo;
 
         private List<Cell> goals = new List<Cell>();
-        static public Cell start, stormTowerKey, iceTowerKey, stormTower, iceTower, Portal;
+        static public Cell start, stormTowerKey, iceTowerKey, stormTower, iceTower, Portal, fakeMushroom;
         HashSet<Point> usedCells = new HashSet<Point>();
 
         private Random rnd = new Random();
@@ -91,8 +92,7 @@ namespace GridForAstar2025
             }
 
             buttons.Add(startButton);
-            buttons.Add(goalButton);
-            buttons.Add(wallbutton);
+
             buttons.Add(findPathButton);
 
             _graphics.PreferredBackBufferWidth = cellCount * cellSize + 200;  // set this value to the desired width of your window
@@ -154,7 +154,7 @@ namespace GridForAstar2025
             int[,] forestPattern = new int[,]
             {
                 {1, 1, 1, 1, 1},
-                {0, 0, 0, 0, 0},
+                {0, 0, 2, 0, 0},
                 {1, 1, 1, 1, 1},
             };
 
@@ -165,9 +165,16 @@ namespace GridForAstar2025
                 {
                     if (forestPattern[y, x] == 1 && Cells.TryGetValue(new Point(x + fOffsetX, y + fOffsetY), out Cell forestCell))
                     {
-                        forestCell.Sprite = sprites["Wall"];
+                        forestCell.Sprite = sprites["Tree"];
                         usedCells.Add(forestCell.Position);
                     }
+                    if (forestPattern[y, x] == 2 && Cells.TryGetValue(new Point(x + fOffsetX, y + fOffsetY), out Cell fakeMushroomCell))
+                    {
+                        fakeMushroom = fakeMushroomCell;
+                        fakeMushroom.Sprite = sprites["FakeMushroom"];
+                        usedCells.Add(fakeMushroom.Position);
+                    }
+
                 }
             }
 
@@ -177,39 +184,39 @@ namespace GridForAstar2025
                 wizard = new(startCell, sprites["BunnyIdleF"]);
                 usedCells.Add(start.Position);
             }
-            if (Cells.TryGetValue(GetRandomUnusedCell(), out Cell goalCell1))
-            {
-                stormTowerKey = goalCell1;
-                stormTowerKey.Sprite = sprites["SilverKey"];
-                goals.Add(stormTowerKey);
-            }
             if (Cells.TryGetValue(new Point(2, 4), out Cell goalCell2))
             {
                 stormTower = goalCell2;
                 stormTower.Sprite = sprites["StormTower"];
-                goals.Add(stormTower);
                 usedCells.Add(stormTower.Position);
-            }
-            if (Cells.TryGetValue(GetRandomUnusedCell(), out Cell goalCell3))
-            {
-                iceTowerKey = goalCell3;
-                iceTowerKey.Sprite = sprites["BlueKey"];
-                goals.Add(iceTowerKey);
             }
             if (Cells.TryGetValue(new Point(8, 7), out Cell goalCell4))
             {
                 iceTower = goalCell4;
                 iceTower.Sprite = sprites["IceTower"];
-                goals.Add(iceTower);
                 usedCells.Add(iceTower.Position);
             }
             if (Cells.TryGetValue(new Point(0, 8), out Cell goalCell5))
             {
                 Portal = goalCell5;
                 Portal.Sprite = sprites["Portal"];
-                goals.Add(Portal);
                 usedCells.Add(Portal.Position);
             }
+            if (Cells.TryGetValue(GetRandomUnusedCell(), out Cell goalCell1))
+            {
+                stormTowerKey = goalCell1;
+                stormTowerKey.Sprite = sprites["SilverKey"];
+            }
+            if (Cells.TryGetValue(GetRandomUnusedCell(), out Cell goalCell3))
+            {
+                iceTowerKey = goalCell3;
+                iceTowerKey.Sprite = sprites["BlueKey"];
+            }
+            goals.Add(stormTowerKey);
+            goals.Add(stormTower);
+            goals.Add(iceTowerKey);
+            goals.Add(iceTower);
+            goals.Add(Portal);
 
             PlaceButtons();
             // TODO: use this.Content to load your game content here
@@ -230,11 +237,7 @@ namespace GridForAstar2025
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
-            foreach (KeyValuePair<Point, Cell> cell in Cells)
-            {
-                cell.Value.Update();
-            }
+            
             foreach (Button btn in buttons)
             {
                 btn.Update();
@@ -247,12 +250,99 @@ namespace GridForAstar2025
 
             if (started && wizard.readyToMove)
             {
-                if (goalIndex == 5)
+                goalIndex++;
+                switch (chosenAlgo)
                 {
-                    goalIndex = 0;
+                    case 1:
+                        {
+                            switch (goalIndex)
+                            {
+                                case 0:
+                                    {
+                                        Astar(goals[0]);
+                                        break;
+                                    }
+                                case 1:
+                                    {
+                                        stormTowerKey.Sprite = sprites["Pixel"];
+                                        Astar(goals[1]);
+                                        break;
+                                    }
+                                case 2:
+                                    {
+                                        Astar(goals[2]);
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        iceTowerKey.Sprite = sprites["Pixel"];
+                                        Astar(goals[3]);
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        Astar(goals[4]);
+                                        break;
+                                    }
+                                case 5:
+                                    {
+                                        started = false;
+                                        goalIndex = -1;
+                                        break;
+                                    }
+
+                            }
+                            break;
+                        }
+                    case 2:
+                        {
+                            switch (goalIndex)
+                            {
+                                case 0:
+                                    {
+                                        //Astar(goals[0]);
+                                        break;
+                                    }
+                                case 1:
+                                    {
+                                        stormTowerKey.Sprite = sprites["Pixel"];
+                                        //Astar(goals[1]);
+                                        break;
+                                    }
+                                case 2:
+                                    {
+                                        //Astar(goals[2]);
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        iceTowerKey.Sprite = sprites["Pixel"];
+                                        //Astar(goals[3]);
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        //Astar(goals[4]);
+                                        break;
+                                    }
+                                case 5:
+                                    {
+                                        started = false;
+                                        goalIndex = -1;
+                                        break;
+                                    }
+
+                            }
+                            break;
+                        }
                 }
-                    Astar(goals[goalIndex]);
-                    goalIndex++;
+
+                
+                
+
+
+
+
 
             }
 
@@ -287,10 +377,21 @@ namespace GridForAstar2025
 
         public void OnButtonClick(BUTTONTYPE clicked)
         {
+            if (clicked == BUTTONTYPE.START)
+            {
+                chosenAlgo = 2;
+                started = true;
+                stormTowerKey.Sprite = sprites["SilverKey"];
+                iceTowerKey.Sprite = sprites["BlueKey"];
+                fakeMushroom.Sprite = sprites["FakeMushroom"];
+            }
             if (clicked == BUTTONTYPE.FINDPATH)
             {
+                chosenAlgo = 1;
                 started = true;
-               
+                stormTowerKey.Sprite = sprites["SilverKey"];
+                iceTowerKey.Sprite = sprites["BlueKey"];
+                fakeMushroom.Sprite = sprites["FakeMushroom"];
             }
             else
             {
@@ -298,33 +399,7 @@ namespace GridForAstar2025
             }
         }
 
-        public void OnCellClick(Cell clicked)
-        {
-
-            if (CurrentButton == BUTTONTYPE.START)
-            {
-                if (start != null)
-                {
-                    start.Reset();
-
-                }
-                start = clicked;
-               
-            }
-            
-            else if (CurrentButton == BUTTONTYPE.WALL)
-            {
-                clicked.Sprite = sprites["Wall"];
-            }
-
-
-            foreach (var item in Cells)
-            {
-                item.Value.spriteColor = Color.White;
-            }
-            
-
-        }
+        
 
 
         public void Astar(Cell goal)
