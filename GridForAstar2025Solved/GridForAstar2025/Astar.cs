@@ -136,7 +136,7 @@ class Astar
                 }
 
                 //must not be wall
-                if (GameWorld.Instance.sprites["Wall"] == curNeighbor.Sprite)
+                if (GameWorld.Instance.sprites["Wall"] == curNeighbor.Sprite || GameWorld.Instance.sprites["Tree"] == curNeighbor.Sprite || GameWorld.Instance.sprites["Mushroom"] == curNeighbor.Sprite)
                 {
                     continue;
                 }
