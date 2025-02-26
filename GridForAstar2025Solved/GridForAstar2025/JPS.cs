@@ -18,125 +18,13 @@ namespace GridForAstar2025
         {
             this.jpsCells = jpsCells;
         }
-
-        private static readonly (int, int)[] Directions =
-        { 
-            (0,-1), (1,0), (0,1), (-1,0), // Cardinal direction
-            (1,-1), (1,1), (-1,1), (-1,-1) // Diagonal direction
-        };
+                      
         
-        public static List<Cell> FindJPSPath(Cell start, Cell goal, int[,] grid)
+        public List<Cell> FindJPSPath(Point startPoint, Point endPoint)
         {
-            List<Cell> openList = new List<Cell> { start };
-            HashSet<Cell> closedList = new HashSet<Cell>();
-
-            while(openList.Count > 0)
-            {
-                var currentCell = openList[0];
-                openList.RemoveAt(0);
-                closedList.Add(currentCell);
-
-                if(currentCell.Position == goal.Position)
-                {
-                    return RetracePath(currentCell, goal);
-                }
-
-                foreach (var direction in Directions)
-                {
-                    
-                }
-            }
-
-        }
-
-        private static Cell Jump(Cell cell,(int,int) direction, int[,] grid, Cell goal )
-        {
-            int x = cell.Position.X + direction.Item1;
-            int y = cell.Position.Y + direction.Item2;
-
-            if (!IsValid(x, y, grid)) 
-            { 
-                return null; 
-            }
-
-            if(x == goal.Position.X && y == goal.Position.Y)
-            {
-                return new Cell(); // HELP!
-            }
-
-        }
-
-        /// <summary>
-        /// A method that checks if a given cell (node) in the grid is valid for movement.
-        /// It returns a boolean value (true or false) based on whether the cell is 
-        /// within the grids boundaries and not an obstacle.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="grid"></param>
-        /// <returns></returns>
-        private static bool IsValid(int x, int y, int[,] grid)
-        {
-            return
-                x >= 0 && y >= 0 && // Ensures the coordinates are not negative.
-                x < grid.GetLength(0) && x < grid.GetLength(1) && // Ensures the coordinates are within the grid boundaries.
-                grid[x, y] == 0; // Checks that the cell is not an obstacle
-        }
-
-        /// <summary>
-        /// Checks for forced neighbors or turning points
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="direction"></param>
-        /// <param name="grid"></param>
-        /// <returns></returns>
-        private static bool IsJumpPoint(int x, int y, (int,int) direction, int[,] grid)
-        {
-            int dx = direction.Item1;
-            int dy = direction.Item2;
-
-            //Check for forced neighbors
-            if(dx !=0 && dy != 0) // diagonal movement
-            {
-                if((IsValid(x-dx, y+dy, grid) && !IsValid(x-dx, y, grid)) ||
-                    (IsValid(x+dx, y-dy, grid) && !IsValid(x, y-dy, grid)))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if(dx != 0) // Horizontal movement
-                {
-                    if((IsValid(x+dx , y+1, grid) && !IsValid(x, y+1, grid)) ||
-                        (IsValid(x - dx, y - 1, grid) && !IsValid(x, y - 1, grid)))
-                    {
-                        return true;
-                    }
-                }
-                else if (dy != 0) // Vertical movement
-                {
-                    if ((IsValid(x + 1, y + dy, grid) && !IsValid(x + 1, y, grid)) ||
-                        (IsValid(x - 1, y - dy, grid) && !IsValid(x -1, y, grid)))
-                    {
-                        return true;
-                    }
-                }
-
-            }
-
-            // Check for turning points
-            if(dx != 0 && dy != 0)
-            {
-                return IsValid(x + dx, y, grid) || IsValid(x, y + dy, grid);
-            }
-
-            return false;
-        }
-
-        public List<Cell> FindPath(Point startPoint, Point endPoint)
-        {            
+            openList.Clear();
+            closedList.Clear();
+            
             foreach (var cell in jpsCells.Values)
             {
                 cell.G = 0;
@@ -152,7 +40,7 @@ namespace GridForAstar2025
                 foreach (var t in openList)
                 {
                     if (t.F < curCell.F ||
-                        t.F == curCell.F && t.H < curCell.H)
+                        (t.F == curCell.F && t.H < curCell.H))
                     {
                         curCell = t;
                     }
@@ -166,7 +54,7 @@ namespace GridForAstar2025
                     return RetracePath(jpsCells[startPoint], jpsCells[endPoint]);
                 }
 
-                List<Cell> neighbors = GetNeighbors(curCell);
+                List<Cell> neighbors = GetJumpNeighbors(curCell, endPoint);
                 foreach (var neighbor in neighbors)
                 {
                     if (closedList.Contains(neighbor))
@@ -176,9 +64,8 @@ namespace GridForAstar2025
                     int newMovementCostToNeighbor = curCell.G + GetDistance(curCell.Position, neighbor.Position);
                     if (newMovementCostToNeighbor < neighbor.G || !openList.Contains(neighbor))
                     {
-                        neighbor.G = newMovementCostToNeighbor;
-                        //calulate h using manhatten principle
-                        neighbor.H = ((Math.Abs(neighbor.Position.X - endPoint.X) + Math.Abs(endPoint.Y - neighbor.Position.Y)) * 10);
+                        neighbor.G = newMovementCostToNeighbor;                        
+                        neighbor.H = GetDistance(neighbor.Position, endPoint);
                         neighbor.Parent = curCell;
 
                         if (!openList.Contains(neighbor))
@@ -220,61 +107,69 @@ namespace GridForAstar2025
             return 14 * dstX + 10 * (dstY - dstX);
         }
 
-        private List<Cell> GetNeighbors(Cell curCell)
+        private List<Cell> GetJumpNeighbors(Cell curCell, Point endPoint)
         {
-            List<Cell> neighbors = new List<Cell>(8);
-            var wallSprite = GameWorld.Instance.sprites["Wall"];
-            for (int i = -1; i <= 1; i++)
+            List<Cell> neighbors = new List<Cell>();
+            Point[] directions = new Point[]
             {
-                for (int j = -1; j <= 1; j++)
+                new Point(0,-1), new Point(1,0), new Point(0,1), new Point(-1,0), // Cardinal direction
+                new Point(1,-1), new Point(1,1), new Point(-1,1), new Point(-1,-1) // Diagonal direction
+            };
+
+            foreach (var direction in directions)
+            {
+                Cell jumpPoint = Jump(curCell.Position, direction, endPoint);
+                if(jumpPoint != null && !neighbors.Contains(jumpPoint))
                 {
-                    //ignore own position.
-                    if (i == 0 && j == 0)
-                    {
-                        continue;
-                    }
-                    ////must be inside grid
-                    //if (curCell.Position.X+i < 0 && curCell.Position.Y+j<0)
-                    //{
-                    //    continue;
-                    //}
-
-                    Cell curNeighbor;
-                    if (jpsCells.TryGetValue(new Point(curCell.Position.X + i, curCell.Position.Y + j), out var cell))
-                    {
-                        curNeighbor = cell;
-                    }
-                    else
-                    {
-                        continue;
-                    }
-
-                    //must not be wall
-                    if (GameWorld.Instance.sprites["Wall"] == curNeighbor.Sprite)
-                    {
-                        continue;
-                    }
-                    //CORNER CASES
-                    // could probably have used a variable for cases... Same performance though.
-                    switch (i)
-                    {
-                        //corner cases upper left
-                        case -1 when j == 1 && (jpsCells[curCell.Position + new Point(i, 0)].Sprite == wallSprite || jpsCells[curCell.Position + new Point(0, j)].Sprite == wallSprite):
-                        //upper right
-                        case 1 when j == 1 && (jpsCells[curCell.Position + new Point(i, 0)].Sprite == wallSprite || jpsCells[curCell.Position + new Point(0, j)].Sprite == wallSprite):
-                        //lower left
-                        case -1 when j == -1 && (jpsCells[curCell.Position + new Point(i, 0)].Sprite == wallSprite || jpsCells[curCell.Position + new Point(0, j)].Sprite == wallSprite):
-                        //lower right 
-                        case 1 when j == -1 && (jpsCells[curCell.Position + new Point(i, 0)].Sprite == wallSprite || jpsCells[curCell.Position + new Point(0, j)].Sprite == wallSprite):
-                            continue;
-                        default:
-                            neighbors.Add(curNeighbor);
-                            break;
-                    }
+                    neighbors.Add(jumpPoint);
                 }
             }
 
             return neighbors;
+        }
+
+        private Cell Jump(Point current, Point direction, Point endPoint)
+        {
+            Point next = new Point(current.X + direction.X, current.Y + direction.Y);
+            if(!jpsCells.ContainsKey(next) || jpsCells[next].Sprite == GameWorld.Instance.sprites["Wall"])
+            {
+                return null;
+            }
+
+            if(next == endPoint)
+            {
+                return jpsCells[next];
+            }
+
+            // Check for forced neighbors
+            if(direction.X != 0 && direction.Y != 0) // diagonal movement 
+            {
+                if ((jpsCells.ContainsKey(new Point(next.X - direction.X, next.Y)) && jpsCells[new Point(next.X - direction.X, next.Y)].Sprite == GameWorld.Instance.sprites["Wall"]) ||
+                    (jpsCells.ContainsKey(new Point(next.X, next.Y - direction.Y)) && jpsCells[new Point(next.X, next.Y - direction.Y)].Sprite == GameWorld.Instance.sprites["Wall"]))
+                {
+                    return jpsCells[next];
+                }
+            }
+            else
+            {
+                if(direction.X != 0) // horizontal movement
+                {
+                    if ((jpsCells.ContainsKey(new Point(next.X, next.Y + 1)) && jpsCells[new Point(next.X, next.Y + 1)].Sprite == GameWorld.Instance.sprites["Wall"]) ||
+                    (jpsCells.ContainsKey(new Point(next.X, next.Y - 1)) && jpsCells[new Point(next.X, next.Y - 1)].Sprite == GameWorld.Instance.sprites["Wall"]))
+                    {
+                        return jpsCells[next];
+                    }
+                }
+                else if(direction.Y != 0) // vertical movement
+                {
+                    if ((jpsCells.ContainsKey(new Point(next.X + 1, next.Y)) && jpsCells[new Point(next.X + 1, next.Y)].Sprite == GameWorld.Instance.sprites["Wall"]) ||
+                    (jpsCells.ContainsKey(new Point(next.X - 1, next.Y)) && jpsCells[new Point(next.X - 1, next.Y)].Sprite == GameWorld.Instance.sprites["Wall"]))
+                    {
+                        return jpsCells[next];
+                    }
+                }
+            }
+            return Jump(next, direction, endPoint);
         }
     }
 }

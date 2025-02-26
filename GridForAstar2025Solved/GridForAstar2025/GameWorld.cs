@@ -337,12 +337,16 @@ namespace GridForAstar2025
             }
             wizard.SetPath(path);
         }
-        int[] jpsArray;
+        
         public void JPS(Cell goal)
         {
             JPS jps = new JPS(Cells);
-            var path = jps.FindIndex(jpsArray,);
-            
+            var path = jps.FindJPSPath(start.Position, goal.Position);
+            foreach (var Variable in path)
+            {
+                Variable.spriteColor = Color.Aqua;
+            }
+            wizard.SetPath(path);
         }
 
 
