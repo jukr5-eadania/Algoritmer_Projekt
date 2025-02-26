@@ -300,29 +300,29 @@ namespace GridForAstar2025
                             {
                                 case 0:
                                     {
-                                        //Astar(goals[0]);
+                                        JPS(goals[0]);
                                         break;
                                     }
                                 case 1:
                                     {
                                         stormTowerKey.Sprite = sprites["Pixel"];
-                                        //Astar(goals[1]);
+                                        JPS(goals[1]);
                                         break;
                                     }
                                 case 2:
                                     {
-                                        //Astar(goals[2]);
+                                        JPS(goals[2]);
                                         break;
                                     }
                                 case 3:
                                     {
                                         iceTowerKey.Sprite = sprites["Pixel"];
-                                        //Astar(goals[3]);
+                                        JPS(goals[3]);
                                         break;
                                     }
                                 case 4:
                                     {
-                                        //Astar(goals[4]);
+                                        JPS(goals[4]);
                                         break;
                                     }
                                 case 5:
