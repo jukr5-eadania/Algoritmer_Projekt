@@ -13,63 +13,130 @@ namespace GridForAstar2025
         Dictionary<Point, Cell> jpsCells;
         private HashSet<Cell> openList = new HashSet<Cell>();
         private HashSet<Cell> closedList = new HashSet<Cell>();
-        
 
         public JPS(Dictionary<Point, Cell> jpsCells)
         {
             this.jpsCells = jpsCells;
         }
 
-        /// <summary>
-        /// Find the index of the cell searched for in the cell array
-        /// </summary>
-        /// <param name="jpsCells"></param>
-        /// <param name="searchCell"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public int FindIndex(Cell[] jpsArrayCells, Cell searchCell)
+        private static readonly (int, int)[] Directions =
+        { 
+            (0,-1), (1,0), (0,1), (-1,0), // Cardinal direction
+            (1,-1), (1,1), (-1,1), (-1,-1) // Diagonal direction
+        };
+        
+        public static List<Cell> FindJPSPath(Cell start, Cell goal, int[,] grid)
         {
-            if(jpsArrayCells is null)
-            {
-                throw new ArgumentNullException("jpsArrayCells was null");
-            }
+            List<Cell> openList = new List<Cell> { start };
+            HashSet<Cell> closedList = new HashSet<Cell>();
 
-            int jumpStep = (int)Math.Floor(Math.Sqrt(jpsArrayCells.Length));
-            int currentCell = 0;
-            int nextCell = jumpStep;
-
-            if (jpsArrayCells.Length != 0)
+            while(openList.Count > 0)
             {
-                while (jpsArrayCells[currentCell-1].CompareTo(searchCell) < 0)
+                var currentCell = openList[0];
+                openList.RemoveAt(0);
+                closedList.Add(currentCell);
+
+                if(currentCell.Position == goal.Position)
                 {
-                    currentCell = nextCell;
-                    nextCell = jumpStep;
-
-                    if(nextCell >= jpsArrayCells.Length)
-                    {
-                        nextCell = jpsArrayCells.Length;
-                        break;
-                    }
+                    return RetracePath(currentCell, goal);
                 }
 
-                for (int i = currentCell; i < nextCell; i++)
+                foreach (var direction in Directions)
                 {
-                    if (jpsArrayCells[i].CompareTo(searchCell) == 0)
-                    {
-                        return i;
-                    }
+                    
                 }
             }
 
-            return -1;
         }
 
-        
-        public List<Cell> FindPath(Point startPoint, Point endPoint)
+        private static Cell Jump(Cell cell,(int,int) direction, int[,] grid, Cell goal )
         {
-            openList.Clear();
-            closedList.Clear();
+            int x = cell.Position.X + direction.Item1;
+            int y = cell.Position.Y + direction.Item2;
 
+            if (!IsValid(x, y, grid)) 
+            { 
+                return null; 
+            }
+
+            if(x == goal.Position.X && y == goal.Position.Y)
+            {
+                return new Cell(); // HELP!
+            }
+
+        }
+
+        /// <summary>
+        /// A method that checks if a given cell (node) in the grid is valid for movement.
+        /// It returns a boolean value (true or false) based on whether the cell is 
+        /// within the grids boundaries and not an obstacle.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="grid"></param>
+        /// <returns></returns>
+        private static bool IsValid(int x, int y, int[,] grid)
+        {
+            return
+                x >= 0 && y >= 0 && // Ensures the coordinates are not negative.
+                x < grid.GetLength(0) && x < grid.GetLength(1) && // Ensures the coordinates are within the grid boundaries.
+                grid[x, y] == 0; // Checks that the cell is not an obstacle
+        }
+
+        /// <summary>
+        /// Checks for forced neighbors or turning points
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="direction"></param>
+        /// <param name="grid"></param>
+        /// <returns></returns>
+        private static bool IsJumpPoint(int x, int y, (int,int) direction, int[,] grid)
+        {
+            int dx = direction.Item1;
+            int dy = direction.Item2;
+
+            //Check for forced neighbors
+            if(dx !=0 && dy != 0) // diagonal movement
+            {
+                if((IsValid(x-dx, y+dy, grid) && !IsValid(x-dx, y, grid)) ||
+                    (IsValid(x+dx, y-dy, grid) && !IsValid(x, y-dy, grid)))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if(dx != 0) // Horizontal movement
+                {
+                    if((IsValid(x+dx , y+1, grid) && !IsValid(x, y+1, grid)) ||
+                        (IsValid(x - dx, y - 1, grid) && !IsValid(x, y - 1, grid)))
+                    {
+                        return true;
+                    }
+                }
+                else if (dy != 0) // Vertical movement
+                {
+                    if ((IsValid(x + 1, y + dy, grid) && !IsValid(x + 1, y, grid)) ||
+                        (IsValid(x - 1, y - dy, grid) && !IsValid(x -1, y, grid)))
+                    {
+                        return true;
+                    }
+                }
+
+            }
+
+            // Check for turning points
+            if(dx != 0 && dy != 0)
+            {
+                return IsValid(x + dx, y, grid) || IsValid(x, y + dy, grid);
+            }
+
+            return false;
+        }
+
+        public List<Cell> FindPath(Point startPoint, Point endPoint)
+        {            
             foreach (var cell in jpsCells.Values)
             {
                 cell.G = 0;
@@ -77,9 +144,6 @@ namespace GridForAstar2025
                 cell.Parent = null;
                 cell.spriteColor = Color.White;
             }
-
-            int jumpStep = (int)Math.Floor(Math.Sqrt(jpsCells.Count));
-            int nextCell = jumpStep;
 
             openList.Add(jpsCells[startPoint]);
             while (openList.Count > 0)
@@ -128,7 +192,7 @@ namespace GridForAstar2025
             return null;
         }
 
-        private List<Cell> RetracePath(Cell startPoint, Cell endPoint)
+        private static List<Cell> RetracePath(Cell startPoint, Cell endPoint)
         {
             List<Cell> path = new List<Cell>();
             Cell currentNode = endPoint;
