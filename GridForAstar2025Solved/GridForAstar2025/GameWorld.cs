@@ -337,6 +337,13 @@ namespace GridForAstar2025
             }
             wizard.SetPath(path);
         }
+        int[] jpsArray;
+        public void JPS(Cell goal)
+        {
+            JPS jps = new JPS(Cells);
+            var path = jps.FindIndex(jpsArray,);
+            
+        }
 
 
         public Point GetRandomUnusedCell()
