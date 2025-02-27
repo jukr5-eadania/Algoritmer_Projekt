@@ -26,6 +26,12 @@ namespace GridForAstar2025
         {
             openList.Clear();
             closedList.Clear();
+                        
+            if(!jpsCells.ContainsKey(startPoint) || !jpsCells.ContainsKey(endPoint))
+            {
+                Debug.WriteLine("Invalid start or end point");
+                return null;
+            }
             
             foreach (var cell in jpsCells.Values)
             {
@@ -139,8 +145,21 @@ namespace GridForAstar2025
         private Cell Jump(Point current, Point direction, Point endPoint)
         {
             Point next = new Point(current.X + direction.X, current.Y + direction.Y);
+            
+            // Check if next is a valid key in the dictionary
+            if (jpsCells.ContainsKey(next))
+            {
+                // Safe to access
+                Cell cell = jpsCells[next];
+            }
+            else
+            {
+                Debug.WriteLine($"Key not found at: {next}");               
+                return null;
+            }
 
-            if(next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next))
+            // Checks for out of bound or blocked
+            if (next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next))
             {
                 Debug.WriteLine($"No jump point found at: {next} (out of bounds)");
                 return null;
@@ -151,15 +170,6 @@ namespace GridForAstar2025
                 return null;
             }
 
-            //if (!jpsCells.ContainsKey(next) || 
-            //    jpsCells[next].Sprite == GameWorld.Instance.sprites["Wall"] || 
-            //    jpsCells[next].Sprite == GameWorld.Instance.sprites["Tree"] ||
-            //    jpsCells[next].Sprite == GameWorld.Instance.sprites["Mushroom"])
-            //{
-            //    Debug.WriteLine($"No jump point found at: {next} (either out of bounds or blocked)");
-            //    return null;
-            //}
-
             if(next == endPoint)
             {
                 return jpsCells[next];
@@ -168,16 +178,12 @@ namespace GridForAstar2025
             // Check for forced neighbors
             if(direction.X != 0 && direction.Y != 0) // diagonal movement 
             {
-                if ((jpsCells.ContainsKey(new Point(next.X - direction.X, next.Y)) && 
-                    jpsCells[new Point(next.X - direction.X, next.Y)].Sprite == GameWorld.Instance.sprites["Wall"] ||
-                    jpsCells[new Point(next.X - direction.X, next.Y)].Sprite == GameWorld.Instance.sprites["Tree"] ||
-                    jpsCells[new Point(next.X - direction.X, next.Y)].Sprite == GameWorld.Instance.sprites["Mushroom"]) 
+                if ((jpsCells.ContainsKey(new Point(next.X - direction.X, next.Y)) && IsBlocked(new Point(next.X - direction.X, next.Y)))                    
                     ||
-                    (jpsCells.ContainsKey(new Point(next.X, next.Y - direction.Y)) && 
-                    jpsCells[new Point(next.X, next.Y - direction.Y)].Sprite == GameWorld.Instance.sprites["Wall"] ||
-                    jpsCells[new Point(next.X, next.Y - direction.Y)].Sprite == GameWorld.Instance.sprites["Tree"] ||
-                    jpsCells[new Point(next.X, next.Y - direction.Y)].Sprite == GameWorld.Instance.sprites["Mushroom"]))
+                    (jpsCells.ContainsKey(new Point(next.X, next.Y - direction.Y)) && IsBlocked(new Point(next.X, next.Y - direction.Y))))
+                    
                 {
+                    Debug.WriteLine($"Jumping from {current} in direction {direction} to {next}");
                     return jpsCells[next];
                 }
             }
@@ -185,31 +191,21 @@ namespace GridForAstar2025
             {
                 if(direction.X != 0) // horizontal movement
                 {
-                    if ((jpsCells.ContainsKey(new Point(next.X, next.Y + 1)) && 
-                        jpsCells[new Point(next.X, next.Y + 1)].Sprite == GameWorld.Instance.sprites["Wall"] ||
-                        jpsCells[new Point(next.X, next.Y + 1)].Sprite == GameWorld.Instance.sprites["Tree"] ||
-                        jpsCells[new Point(next.X, next.Y + 1)].Sprite == GameWorld.Instance.sprites["Mushroom"]) 
+                    if ((jpsCells.ContainsKey(new Point(next.X, next.Y + 1)) && IsBlocked(new Point(next.X, next.Y + 1)))
                         ||
-                        (jpsCells.ContainsKey(new Point(next.X, next.Y - 1)) && 
-                        jpsCells[new Point(next.X, next.Y - 1)].Sprite == GameWorld.Instance.sprites["Wall"] ||
-                        jpsCells[new Point(next.X, next.Y - 1)].Sprite == GameWorld.Instance.sprites["Tree"] ||
-                        jpsCells[new Point(next.X, next.Y - 1)].Sprite == GameWorld.Instance.sprites["Mushroom"]))
+                        (jpsCells.ContainsKey(new Point(next.X, next.Y - 1)) && IsBlocked(new Point(next.X, next.Y - 1))))                        
                     {
+                        Debug.WriteLine($"Jumping from {current} in direction {direction} to {next}");
                         return jpsCells[next];
                     }
                 }
                 else if(direction.Y != 0) // vertical movement
                 {
-                    if ((jpsCells.ContainsKey(new Point(next.X + 1, next.Y)) && 
-                        jpsCells[new Point(next.X + 1, next.Y)].Sprite == GameWorld.Instance.sprites["Wall"] ||
-                        jpsCells[new Point(next.X + 1, next.Y)].Sprite == GameWorld.Instance.sprites["Tree"] ||
-                        jpsCells[new Point(next.X + 1, next.Y)].Sprite == GameWorld.Instance.sprites["Mushroom"]) 
+                    if ((jpsCells.ContainsKey(new Point(next.X + 1, next.Y)) && IsBlocked(new Point(next.X + 1, next.Y))) 
                         ||
-                        (jpsCells.ContainsKey(new Point(next.X - 1, next.Y)) && 
-                        jpsCells[new Point(next.X - 1, next.Y)].Sprite == GameWorld.Instance.sprites["Wall"] ||
-                        jpsCells[new Point(next.X - 1, next.Y)].Sprite == GameWorld.Instance.sprites["Tree"] ||
-                        jpsCells[new Point(next.X - 1, next.Y)].Sprite == GameWorld.Instance.sprites["Mushroom"]))
+                        (jpsCells.ContainsKey(new Point(next.X - 1, next.Y)) && IsBlocked(new Point(next.X - 1, next.Y))))
                     {
+                        Debug.WriteLine($"Jumping from {current} in direction {direction} to {next}");
                         return jpsCells[next];
                     }
                 }
@@ -219,9 +215,9 @@ namespace GridForAstar2025
         private bool IsBlocked(Point point)
         {
             return jpsCells.ContainsKey(point) &&
-                        jpsCells[point].Sprite == GameWorld.Instance.sprites["Wall"] ||
+                        (jpsCells[point].Sprite == GameWorld.Instance.sprites["Wall"] ||
                         jpsCells[point].Sprite == GameWorld.Instance.sprites["Tree"] ||
-                        jpsCells[point].Sprite == GameWorld.Instance.sprites["Mushroom"];
+                        jpsCells[point].Sprite == GameWorld.Instance.sprites["Mushroom"]);
         }
     }
 }

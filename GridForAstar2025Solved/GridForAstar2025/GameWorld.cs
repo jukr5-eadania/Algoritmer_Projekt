@@ -337,14 +337,10 @@ namespace GridForAstar2025
                         }
                 }
 
-                
-                
-
-
-
-
+               
 
             }
+
 
             base.Update(gameTime);
         }
@@ -424,6 +420,10 @@ namespace GridForAstar2025
             wizard.SetPath(path);
         }
 
+        public bool HasReachedGoal(Cell goal)
+        {
+            return wizard.pos.X == goal.Position.X && wizard.pos.Y == goal.Position.Y;
+        }
 
         public Point GetRandomUnusedCell()
         {
