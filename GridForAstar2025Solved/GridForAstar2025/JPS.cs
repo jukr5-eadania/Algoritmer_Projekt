@@ -147,33 +147,31 @@ namespace GridForAstar2025
             Point next = new Point(current.X + direction.X, current.Y + direction.Y);
             
             // Check if next is a valid key in the dictionary
-            if (jpsCells.ContainsKey(next))
-            {
-                // Safe to access
-                Cell cell = jpsCells[next];
-            }
-            else
+            if (!jpsCells.ContainsKey(next) || IsBlocked(next))
             {
                 Debug.WriteLine($"Key not found at: {next}");               
                 return null;
+                
             }
-
-            // Checks for out of bound or blocked
-            if (next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next))
-            {
-                Debug.WriteLine($"No jump point found at: {next} (out of bounds)");
-                return null;
-            }
-            if (next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next) || IsBlocked(next))
-            {
-                Debug.WriteLine($"No jump point found at: {next} (blocked)");
-                return null;
-            }
+            
 
             if(next == endPoint)
             {
                 return jpsCells[next];
             }
+
+
+            //// Checks for out of bound or blocked
+            //if (next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next))
+            //{
+            //    Debug.WriteLine($"No jump point found at: {next} (out of bounds)");
+            //    return null;
+            //}
+            //if (next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next) || IsBlocked(next))
+            //{
+            //    Debug.WriteLine($"No jump point found at: {next} (blocked)");
+            //    return null;
+            //}
 
             // Check for forced neighbors
             if(direction.X != 0 && direction.Y != 0) // diagonal movement 

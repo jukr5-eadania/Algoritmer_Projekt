@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Transactions;
 
@@ -217,6 +218,7 @@ namespace GridForAstar2025
             goals.Add(iceTowerKey);
             goals.Add(iceTower);
             goals.Add(Portal);
+            Debug.WriteLine("Placed goals");
 
             PlaceButtons();
             // TODO: use this.Content to load your game content here
@@ -247,100 +249,108 @@ namespace GridForAstar2025
             {
                 wizard.Update(gameTime);
             }
-
-            if (started && wizard.readyToMove)
+            
+            if (started && wizard.readyToMove)                
             {
-                goalIndex++;
-                switch (chosenAlgo)
-                {
-                    case 1:
-                        {
-                            switch (goalIndex)
-                            {
-                                case 0:
-                                    {
-                                        Astar(goals[0]);
-                                        break;
+               goalIndex++;
+               switch (chosenAlgo)
+               {                    
+                    case 1:                            
+                        {                                
+                            switch (goalIndex)                                
+                            {                                    
+                                case 0:                                        
+                                    {                                            
+                                        Astar(goals[0]);                                        
+                                        break;                                        
+                                    }                                    
+                                case 1:                                
+                                    {                                    
+                                        stormTowerKey.Sprite = sprites["Pixel"];                                        
+                                        Astar(goals[1]);                                        
+                                        break;                                        
+                                    }                                    
+                                case 2:                                        
+                                    {                                    
+                                        Astar(goals[2]);                                        
+                                        break;                                        
+                                    }                                    
+                                case 3:                                
+                                    {                                    
+                                        iceTowerKey.Sprite = sprites["Pixel"];                                        
+                                        Astar(goals[3]);                                        
+                                        break;                                        
+                                    }                                    
+                                case 4:                                
+                                    {                                    
+                                        Astar(goals[4]);                                        
+                                        break;                                        
+                                    }                                    
+                                case 5:                                
+                                    {                                    
+                                        started = false;                                        
+                                        goalIndex = -1;                                        
+                                        break;                                        
                                     }
-                                case 1:
-                                    {
-                                        stormTowerKey.Sprite = sprites["Pixel"];
-                                        Astar(goals[1]);
-                                        break;
-                                    }
-                                case 2:
-                                    {
-                                        Astar(goals[2]);
-                                        break;
-                                    }
-                                case 3:
-                                    {
-                                        iceTowerKey.Sprite = sprites["Pixel"];
-                                        Astar(goals[3]);
-                                        break;
-                                    }
-                                case 4:
-                                    {
-                                        Astar(goals[4]);
-                                        break;
-                                    }
-                                case 5:
-                                    {
-                                        started = false;
-                                        goalIndex = -1;
-                                        break;
-                                    }
-
                             }
-                            break;
+                                break;
                         }
-                    case 2:
-                        {
+                        
+                    case 2:                    
+                        {                        
                             switch (goalIndex)
-                            {
+                            {   
                                 case 0:
-                                    {
-                                        JPS(goals[0]);
+                                    {                                        
+                                        JPS(goals[0]);   
+                                        Debug.WriteLine("goal found} : case 0");
                                         break;
                                     }
                                 case 1:
                                     {
                                         stormTowerKey.Sprite = sprites["Pixel"];
                                         JPS(goals[1]);
+                                        Debug.WriteLine("goal found} : case 1");
                                         break;
                                     }
                                 case 2:
                                     {
                                         JPS(goals[2]);
+                                        Debug.WriteLine("goal found} : case 2");
                                         break;
                                     }
                                 case 3:
                                     {
                                         iceTowerKey.Sprite = sprites["Pixel"];
                                         JPS(goals[3]);
+                                        Debug.WriteLine("goal found} : case 3");
                                         break;
                                     }
                                 case 4:
                                     {
                                         JPS(goals[4]);
+                                        Debug.WriteLine("goal found} : case 4");
                                         break;
                                     }
                                 case 5:
                                     {
+                                        Debug.WriteLine("All goals found");
                                         started = false;
                                         goalIndex = -1;
+
                                         break;
                                     }
 
                             }
+                       
                             break;
                         }
-                }
+               }
 
-               
+
 
             }
-
+            
 
             base.Update(gameTime);
         }
@@ -413,11 +423,17 @@ namespace GridForAstar2025
         {
             JPS jps = new JPS(Cells);
             var path = jps.FindJPSPath(start.Position, goal.Position);
-            foreach (var Variable in path)
+            if (path != null)
             {
+                foreach (var Variable in path)
+                {
                 Variable.spriteColor = Color.Aqua;
+                }
+
+                wizard.SetPath(path);
             }
-            wizard.SetPath(path);
+            
+
         }
 
         public bool HasReachedGoal(Cell goal)
