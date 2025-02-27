@@ -423,17 +423,26 @@ namespace GridForAstar2025
         {
             JPS jps = new JPS(Cells);
             var path = jps.FindJPSPath(start.Position, goal.Position);
-            if (path != null)
+            
+            if (path == null || path.Count == 0)
+            {
+                Debug.WriteLine(" defult to astar path");
+                Astar astar = new Astar(Cells);
+                path = astar.FindPath(start.Position, goal.Position);
+            }            
+            if ( path != null && path.Count > 0)
             {
                 foreach (var Variable in path)
                 {
-                Variable.spriteColor = Color.Aqua;
+                    Variable.spriteColor = Color.Aqua;
                 }
 
                 wizard.SetPath(path);
             }
-            
-
+            else
+            {
+                Debug.WriteLine("! No path at all !");
+            }
         }
 
         public bool HasReachedGoal(Cell goal)

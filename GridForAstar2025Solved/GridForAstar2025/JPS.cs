@@ -161,18 +161,6 @@ namespace GridForAstar2025
             }
 
 
-            //// Checks for out of bound or blocked
-            //if (next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next))
-            //{
-            //    Debug.WriteLine($"No jump point found at: {next} (out of bounds)");
-            //    return null;
-            //}
-            //if (next.X < 0 || next.Y < 0 || !jpsCells.ContainsKey(next) || IsBlocked(next))
-            //{
-            //    Debug.WriteLine($"No jump point found at: {next} (blocked)");
-            //    return null;
-            //}
-
             // Check for forced neighbors
             if(direction.X != 0 && direction.Y != 0) // diagonal movement 
             {
